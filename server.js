@@ -12,9 +12,6 @@ const promisify = require('es6-promisify');
 require('./handlers/passport');
 
 
-
-
-
 const cors = require('cors');
 
  
@@ -47,8 +44,6 @@ app.use(session({
     saveUninitialized: false,
     store: new MongoStore({ mongooseConnection: mongoose.connection })
   }));
-
-
 
 
 mongoose.connect(process.env.DATABASE , {

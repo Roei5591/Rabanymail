@@ -86,15 +86,17 @@ exports.updateAccount = async (req, res) => {
 
 exports.getUsername = async (req, res , next) => {
 
-  const username = req.body.to.split('@')[0];
+
+  //console.log(req.body);
+  
+  const username = req.body.to.split(',').map( mail => mail.split('@')[0].trim());
+ 
   //console.log("NAME: " + username);
-  const user = await User.findOne({ username: username });
+  const user = await User.find({ username: username });
   //console.log(user);
-  if(!user){
+  if(user.length == 0){
     console.log("No user"); 
     res.status(400).send("nop");
-    
-    
     //throw new Error("User do not Exist!");
   } else {
   res.locals.user = user;

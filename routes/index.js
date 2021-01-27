@@ -6,16 +6,14 @@ const messagesController = require('../controllers/messagesController');
 const bodyParser = require('body-parser');
 const multer  = require('multer');
 
-router.get("/", (req, res) => res.send("hello world"));
+//router.get("/", (req, res) => res.send("hello world"));
 
-router.post("/", multer().any(),  catchErrors(userController.getUsername) , messagesController.createMessage);
+router.post("/", multer().any(),  catchErrors(userController.getUsername) , catchErrors(messagesController.createMessage));
+
+//router.post("/" , catchErrors(messagesController.createMessage));
 
 router.post('/register',
   //userController.validateRegister,
-  // we need to know about errors if 
-  // validation will be passed, but registration 
-  // will be failed in some reasons, e.g. second 
-  // registration with same email
   catchErrors(userController.register),
  // catchErrors(userController.login)
   );
@@ -31,7 +29,9 @@ router.post('/register',
 
   router.get('/logout', userController.logout);
 
-  router.post('/m',  messagesController.sendMessage);
+  router.post('/messages', catchErrors(messagesController.sendMessage));
+  router.get('/messages/inbox/' , catchErrors(messagesController.getInbox));
+  router.get('/messages/inbox/:userId' , catchErrors(messagesController.getInbox));
 
 
   

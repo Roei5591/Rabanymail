@@ -1,28 +1,30 @@
 const mongoose = require('mongoose');
-const User = mongoose.model('User');
 const passport = require('passport');
 const promisify = require('es6-promisify');
 const Message = mongoose.model('Message');
 const sendgrid = require('../handlers/sendgrid');
+const simpleParser = require('mailparser').simpleParser;
+
+//to delete
+const User = mongoose.model('User');
 
 
 
 exports.createMessage = async (req, res) => {
-
-    const massage = {
-
-    }
-    const user = res.locals.user
-    console.log("FETCH");
-    console.log(req.body.from);
+ // console.log("body " + req.body);
+    const user = res.locals.user[0];
+    
+   console.log(req.body.from);
  
     res.send("G");
+
   };
 
   exports.sendMessage = async (req, res) => {
 
     let msg;
-    req.user = { _id: "60099c9b214b1e0860e32d8b", username: "rrr" };
+    const username = "123";
+    req.user = await User.findOne({ username: username });
     //console.log("BEFORE SENDING");
     const to = req.body.to;
     //console.log(to);
@@ -39,13 +41,6 @@ exports.createMessage = async (req, res) => {
       await sendgrid.send(msg);
       //console.log("email " + req.body.to);
       
-      req.body.isStarred = false;
-      req.body.isOutbound = true;
-      req.body.user = req.user._id;
-
-      const message = new Message(req.body);  
-         
-      await message.save()
       
         //console.log("Messege saved to DB " +  req.body.to);
         
@@ -53,10 +48,41 @@ exports.createMessage = async (req, res) => {
         console.error(error)
       }
 
-      //console.log("AFTER" + req.body.to);
     }  
+
+
+    req.body.to = to;
+    req.body.isStarred = false;
+    req.body.isOutbound = true;
+    req.body.user = req.user._id;
+
+    const message = new Message(req.body);  
+         
+    await message.save()
+
+
+
     res.send("msg");   
   };
+
+
+  exports.getInbox = async (req, res) => {
+
+    const username = "rrr";
+    const user = await User.findOne({ username: username });
+
+
+    console.log(req.params.userId);
+    const userId =  req.params.userId || user._id;
+    
+    const inbox = await Message.find({user: userId });
+
+    res.send(inbox);   
+  };
+
+
+
+
 
 
 
