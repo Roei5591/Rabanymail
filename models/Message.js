@@ -12,7 +12,7 @@ const messageSchema = new mongoose.Schema({
     to: {
 		type: [String],
 		trim: true,
-		required: 'Please enter'
+		required: 'Please enter '
 	},
 	subject: {
 		type: String,

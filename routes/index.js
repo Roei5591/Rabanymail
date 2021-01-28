@@ -33,6 +33,8 @@ router.post('/register',
   router.get('/messages/inbox/' , catchErrors(messagesController.getInbox));
   router.get('/messages/inbox/:userId' , catchErrors(messagesController.getInbox));
 
+  router.get('/messages/sent/' , catchErrors(messagesController.getSent));
+  router.get('/messages/sent/:userId' , catchErrors(messagesController.getSent));
 
   
 

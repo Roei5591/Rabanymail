@@ -3,46 +3,51 @@ const passport = require('passport');
 const promisify = require('es6-promisify');
 const Message = mongoose.model('Message');
 const sendgrid = require('../handlers/sendgrid');
-const simpleParser = require('mailparser').simpleParser;
+const parser = require('../handlers/parser');
 
 //to delete
 const User = mongoose.model('User');
 
 
-
 exports.createMessage = async (req, res) => {
- // console.log("body " + req.body);
-    const user = res.locals.user[0];
-    
-   console.log(req.body.from);
- 
-    res.send("G");
+  
+  const users = res.locals.users; 
+  const msg = parser.parseMessage(req);
+
+
+  for(const user of users) {
+    try {
+      msg.to = `${user.username}@rabanymail.com`;
+      msg.user = user._id;
+
+      const message = new Message(msg);
+      await message.save();
+
+    } catch(error) {
+        console.error(error)
+    }
+  }
+
+    res.send("All good");
 
   };
 
   exports.sendMessage = async (req, res) => {
 
     let msg;
-    const username = "123";
-    req.user = await User.findOne({ username: username });
-    //console.log("BEFORE SENDING");
+    const username = "rrr";
+    req.user = req.user || await User.findOne({ username: username });
+
     const to = req.body.to;
-    //console.log(to);
-
-    //await Message.deleteMany();
-
+ 
     for (const email of to) {
       try {
-      req.body.to = email;
-      req.body.from = req.user.username + "@rabanymail.com";
+      req.body.to = `${email}`;
+      req.body.from = `${req.user.username}@rabanymail.com`;
      
       msg = {...req.body};
 
       await sendgrid.send(msg);
-      //console.log("email " + req.body.to);
-      
-      
-        //console.log("Messege saved to DB " +  req.body.to);
         
       } catch(error) {
         console.error(error)
@@ -50,9 +55,7 @@ exports.createMessage = async (req, res) => {
 
     }  
 
-
     req.body.to = to;
-    req.body.isStarred = false;
     req.body.isOutbound = true;
     req.body.user = req.user._id;
 
@@ -60,7 +63,7 @@ exports.createMessage = async (req, res) => {
          
     await message.save()
 
-
+    //await Message.deleteMany();
 
     res.send("msg");   
   };
@@ -69,18 +72,28 @@ exports.createMessage = async (req, res) => {
   exports.getInbox = async (req, res) => {
 
     const username = "rrr";
-    const user = await User.findOne({ username: username });
+    req.user = req.user || await User.findOne({username: username });
 
 
-    console.log(req.params.userId);
-    const userId =  req.params.userId || user._id;
+    const userId =  req.params.userId || req.user._id;
     
-    const inbox = await Message.find({user: userId });
+    const inbox = await Message.find({user: userId , isOutbound: false});
 
     res.send(inbox);   
   };
 
+  exports.getSent = async (req, res) => {
 
+    const username = "rrr";
+    req.user = req.user || await User.findOne({ username: username });
+
+
+    const userId =  req.params.userId || req.user._id;
+    
+    const inbox = await Message.find({user: userId  , isOutbound: true});
+
+    res.send(inbox);   
+  };
 
 
 
