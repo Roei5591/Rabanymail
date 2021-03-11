@@ -95,7 +95,18 @@ exports.createMessage = async (req, res) => {
     res.send(inbox);   
   };
 
+  exports.getStarred = async (req, res) => {
 
+    const username = "rrr";
+    req.user = req.user || await User.findOne({ username: username });
+
+
+    const userId =  req.params.userId || req.user._id;
+    
+    const inbox = await Message.find({user: userId  , isStarred: true});
+
+    res.send(inbox);   
+  };
 
 
 

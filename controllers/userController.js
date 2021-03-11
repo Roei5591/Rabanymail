@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const passport = require('passport');
-const promisify = require('es6-promisify');
+
 
 
 
@@ -32,20 +32,21 @@ exports.validateRegister = (req, res, next) => {
 
 exports.register = async (req, res, next) => {
   const user = new User({ username: req.body.username });
-  const register = promisify(User.register, User);
-  await register(user, req.body.password);
+  //const register = promisify(User.register, User);
+  await User.register(user, req.body.password);
   next(); 
 };
 
 exports.login =  (req, res, next) => { 
-  passport.authenticate("local", (err, user, info) => {
+  console.log(req.user);
+  return passport.authenticate("local", (err, user, info) => {
   if (err) throw err;
   if (!user) res.send("No User Exists");
   else {
     req.logIn(user, (err) => {
       if (err) throw err;
       res.send("Successfully Authenticated");
-      console.log(req.user);
+      //console.log(req.user);
     });
   }
 })(req, res, next)

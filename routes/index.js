@@ -23,7 +23,7 @@ router.post('/register',
 
   //dev
   router.get("/user", (req, res) => {
-    console.log(req.user);
+    //console.log(req.user);
     res.send(req.user); // The req.user stores the entire user that has been authenticated inside of it.
   });
 
@@ -36,6 +36,7 @@ router.post('/register',
   router.get('/messages/sent/' , catchErrors(messagesController.getSent));
   router.get('/messages/sent/:userId' , catchErrors(messagesController.getSent));
 
-  
+  router.get('/messages/starred/' , catchErrors(messagesController.getStarred));
+  router.get('/messages/starred/:userId' , catchErrors(messagesController.getStarred));
 
 module.exports = router;
