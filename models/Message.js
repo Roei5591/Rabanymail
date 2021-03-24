@@ -17,7 +17,7 @@ const messageSchema = new mongoose.Schema({
 	subject: {
 		type: String,
         trim: true,
-        default:""
+        default:"(no subject)"
     },
     text: String,
     html:String,
@@ -34,6 +34,10 @@ const messageSchema = new mongoose.Schema({
         type:Boolean,
         default: false
     },
+    isRead:{
+      type:Boolean,
+      default: false
+  },
     isOutbound: {
         type:Boolean,
         default: false

@@ -41,12 +41,12 @@ exports.login =  (req, res, next) => {
   console.log(req.user);
   return passport.authenticate("local", (err, user, info) => {
   if (err) throw err;
-  if (!user) res.send("No User Exists");
+  if (!user) res.send("");
   else {
     req.logIn(user, (err) => {
       if (err) throw err;
-      res.send("Successfully Authenticated");
-      //console.log(req.user);
+      res.send({username : user.username , firstChar:  user.username[0]}); 
+      console.log(user.username);
     });
   }
 })(req, res, next)
@@ -59,7 +59,16 @@ exports.logout = (req, res) => {
   res.send("logout");
 };
 
-exports.isLoggedIn = (req, res, next) => {
+exports.getUser = (req, res, next) => {
+  // first check if the user is authenticated
+  if (req.isAuthenticated()) {
+    res.send({username : req.user.username , firstChar:  req.user.username[0]}); 
+  } else {
+    res.send("");
+  }
+};
+
+exports.isLoggedIn2 = (req, res, next) => {
   // first check if the user is authenticated
   if (req.isAuthenticated()) {
     next(); // carry on! They are logged in!

@@ -22,10 +22,7 @@ router.post('/register',
 
 
   //dev
-  router.get("/user", (req, res) => {
-    //console.log(req.user);
-    res.send(req.user); // The req.user stores the entire user that has been authenticated inside of it.
-  });
+  router.get("/user", userController.getUser);
 
   router.get('/logout', userController.logout);
 
@@ -38,5 +35,6 @@ router.post('/register',
 
   router.get('/messages/starred/' , catchErrors(messagesController.getStarred));
   router.get('/messages/starred/:userId' , catchErrors(messagesController.getStarred));
+  router.post('/messages/starred/' , catchErrors(messagesController.toggleStarMassage));
 
 module.exports = router;

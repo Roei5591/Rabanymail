@@ -5,10 +5,11 @@ const Message = mongoose.model('Message');
 const sendgrid = require('../handlers/sendgrid');
 const parser = require('../handlers/parser');
 
+
 //to delete
 const User = mongoose.model('User');
 
-
+//receiving mail
 exports.createMessage = async (req, res) => {
   
   const users = res.locals.users; 
@@ -32,17 +33,21 @@ exports.createMessage = async (req, res) => {
 
   };
 
+
+  //send mail
   exports.sendMessage = async (req, res) => {
 
     let msg;
-    const username = "rrr";
-    req.user = req.user || await User.findOne({ username: username });
+
 
     const to = req.body.to;
+
+    console.log("send here:")
+    console.log(req.body)
  
     for (const email of to) {
       try {
-      req.body.to = `${email}`;
+      req.body.to = email;
       req.body.from = `${req.user.username}@rabanymail.com`;
      
       msg = {...req.body};
@@ -57,6 +62,7 @@ exports.createMessage = async (req, res) => {
 
     req.body.to = to;
     req.body.isOutbound = true;
+    req.body.isRead = true;
     req.body.user = req.user._id;
 
     const message = new Message(req.body);  
@@ -71,14 +77,16 @@ exports.createMessage = async (req, res) => {
 
   exports.getInbox = async (req, res) => {
 
-    const username = "rrr";
-    req.user = req.user || await User.findOne({username: username });
-
-
-    const userId =  req.params.userId || req.user._id;
+    req.isAuthenticated();
     
-    const inbox = await Message.find({user: userId , isOutbound: false});
-
+    const inbox = await Message.find({user: req.user._id , isOutbound: false});
+   
+    inbox.forEach(mail => {
+      delete mail._doc.user;
+      return mail;
+    });
+     
+    //console.log(inbox[0]);
     res.send(inbox);   
   };
 
@@ -106,6 +114,22 @@ exports.createMessage = async (req, res) => {
     const inbox = await Message.find({user: userId  , isStarred: true});
 
     res.send(inbox);   
+  };
+
+  exports.toggleStarMassage = async (req, res) => {
+
+     
+    const messageId = req.body.mailId;
+    
+    const toggle = !(await Message.findOne({_id: messageId})).isStarred
+    await Message.updateOne({_id: messageId},  
+      {isStarred: toggle}, function (err, docs) { 
+      if (err){ 
+        res.send(err); 
+      }  
+  }); 
+
+    res.send("star");   
   };
 
 
