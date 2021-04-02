@@ -42,11 +42,16 @@ const messageSchema = new mongoose.Schema({
         type:Boolean,
         default: false
     },
+    isTrash: {
+      type:Boolean,
+      default: false
+  },
 
       
   });
 
 // Define our indexes
+
 
 
 function autopopulate(next) {

@@ -5,6 +5,7 @@ const Message = mongoose.model('Message');
 const sendgrid = require('../handlers/sendgrid');
 const parser = require('../handlers/parser');
 
+let c = 0;
 
 //to delete
 const User = mongoose.model('User');
@@ -40,14 +41,14 @@ exports.createMessage = async (req, res) => {
     let msg;
 
 
-    const to = req.body.to;
+    //const to = req.body.to;
 
     console.log("send here:")
-    console.log(req.body)
+    
  
-    for (const email of to) {
+    
       try {
-      req.body.to = email;
+      //req.body.to = email;
       req.body.from = `${req.user.username}@rabanymail.com`;
      
       msg = {...req.body};
@@ -55,23 +56,25 @@ exports.createMessage = async (req, res) => {
       await sendgrid.send(msg);
         
       } catch(error) {
-        console.error(error)
+        console.error(error.response.body.errors)
       }
 
-    }  
+     
 
-    req.body.to = to;
+   // req.body.to = to;
     req.body.isOutbound = true;
     req.body.isRead = true;
     req.body.user = req.user._id;
-
+    console.log(req.body);
     const message = new Message(req.body);  
          
     await message.save()
 
     //await Message.deleteMany();
 
-    res.send("msg");   
+    delete req.body.user;
+
+    res.send(req.body);   
   };
 
 
@@ -85,9 +88,30 @@ exports.createMessage = async (req, res) => {
       delete mail._doc.user;
       return mail;
     });
-     
+    console.log("inbox");
     //console.log(inbox[0]);
     res.send(inbox);   
+  };
+
+  exports.getAllMail = async (req, res) => {
+
+    req.isAuthenticated();
+
+    const mailSize = req.body.mailSize;
+
+    const needToUpdate = false
+    const allMail = await Message.find({user: req.user._id});
+    
+    if(allMail.length !== mailSize) {
+
+    allMail.forEach(mail => {
+      delete mail._doc.user;
+      return mail;
+    });
+    res.send({allMail , needToUpdate : true});  
+  } else {
+    res.send({allMail : [] , needToUpdate : false}); 
+  }
   };
 
   exports.getSent = async (req, res) => {
@@ -121,8 +145,8 @@ exports.createMessage = async (req, res) => {
      
     const messageId = req.body.mailId;
     
-    const toggle = !(await Message.findOne({_id: messageId})).isStarred
-    await Message.updateOne({_id: messageId},  
+    const toggle = !(await Message.findById( messageId)).isStarred;
+    await Message.updateMany({_id: messageId},  
       {isStarred: toggle}, function (err, docs) { 
       if (err){ 
         res.send(err); 
@@ -131,8 +155,53 @@ exports.createMessage = async (req, res) => {
 
     res.send("star");   
   };
+  
+  exports.deleteMessages = async (req, res) => {
 
+    const messageId = req.body.mailId;
+    
+  
+    await Message.deleteMany({_id: messageId} , function (err) {
+       
+      if (err){ 
+        res.send(err); 
+      } 
+    }); 
 
+    
+    res.send("remove");   
+  };
+
+  exports.toggleIsTrash = async (req, res) => {
+
+    const messageId = req.body.mailId;
+    
+    const toggle = !(await Message.findById( messageId[0])).isTrash;
+    await Message.updateMany({_id: messageId},  
+      {isTrash: toggle}, function (err) {
+       
+      if (err){ 
+        res.send(err); 
+      }  
+  }); 
+
+    res.send("star");   
+  };
+
+  exports.markAsRead = async (req, res) => {
+
+    const messageId = req.body.mailId;
+    const isRead = req.body.isRead;
+    
+    await Message.updateMany({_id: messageId},  
+      {isRead}, function (err) { 
+      if (err){ 
+        res.send(err); 
+      }  
+  }); 
+
+    res.send("star");   
+  };
 
   exports.sendMessage2 = async (req, res) => {
 
@@ -202,6 +271,7 @@ exports.createMessage = async (req, res) => {
 
     res.send(req.user);
   };
+
 
 
 
