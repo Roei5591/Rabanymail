@@ -32,8 +32,7 @@ app.use(cookieParser());
 app.use(
     cors({
       origin: "*", // <-- location of the react app were connecting to
-      AccessControlAllowOrigin: "*",
-      credentials: true,
+  
     })
   );
 
