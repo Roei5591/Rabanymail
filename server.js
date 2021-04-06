@@ -31,7 +31,7 @@ app.use(cookieParser());
 
 app.use(
     cors({
-      origin: "https://rabany-mail.firebaseapp.com", // <-- location of the react app were connecting to
+      origin: "https://rabany-mail.firebaseapp.com", // "http://localhost:3000" 
       credentials: true,
     })
   );
@@ -43,8 +43,14 @@ app.use(session({
     key: process.env.KEY,
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({ mongooseConnection: mongoose.connection })
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    cookie: {
+      sameSite: "none",
+      secure: true,
+    }
+  
   }));
+
 
 
 mongoose.connect(process.env.DATABASE , {
