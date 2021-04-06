@@ -15,7 +15,7 @@ const userSchema = new Schema({
     lowercase: true,
     trim: true,
     //validate: [validator.isEmail, 'Invalid Email Address'],
-    required: 'Please Supply an email address'
+    //required: 'Please Supply an email address'
   },
 
   //resetPasswordToken: String,

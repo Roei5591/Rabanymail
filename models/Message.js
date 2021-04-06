@@ -47,7 +47,6 @@ const messageSchema = new mongoose.Schema({
       default: false
   },
 
-      
   });
 
 // Define our indexes

@@ -3,22 +3,21 @@ const router = express.Router();
 const { catchErrors } = require('../handlers/errorHandlers');
 const userController = require('../controllers/userController');
 const messagesController = require('../controllers/messagesController');
-const bodyParser = require('body-parser');
+
 const multer  = require('multer');
 
-//router.get("/", (req, res) => res.send("hello world"));
 
 router.post("/", multer().any(),  catchErrors(userController.getUsername) , catchErrors(messagesController.createMessage));
 
 //router.post("/" , catchErrors(messagesController.createMessage));
 
 router.post('/register',
-  //userController.validateRegister,
+  userController.validateRegister,
   catchErrors(userController.register),
- // catchErrors(userController.login)
   );
 
   router.post('/login', userController.login);
+  
 
 
   //dev

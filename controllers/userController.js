@@ -1,52 +1,72 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const passport = require('passport');
+const { body, validationResult } = require('express-validator');
 
 
 
-
-
-
-exports.validateRegister = (req, res, next) => {
-  req.sanitizeBody('name');
-  req.checkBody('name', 'You must supply a name!').notEmpty();
-  req.checkBody('email', 'That Email is not valid!').isEmail();
-  req.sanitizeBody('email').normalizeEmail({
-    gmail_remove_dots: false,
-    remove_extension: false,
-    gmail_remove_subaddress: false
-  });
-  req.checkBody('password', 'Password Cannot be Blank!').notEmpty();
-  req.checkBody('password-confirm', 'Confirmed Password cannot be blank!').notEmpty();
-  req.checkBody('password-confirm', 'Oops! Your passwords do not match').equals(req.body.password);
-
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('error', errors.map(err => err.msg));
-    res.render('register', { title: 'Register', body: req.body, flashes: req.flash() });
-    return; // stop the fn from running
+exports.validateRegister = async (req, res, next) => {
+ 
+    await body('username', 'You must supply a name!').notEmpty().run(req),
+    await body('username').custom(value => {
+      return  User.findOne({ username: req.body.username }).then(user => {
+        if (user) {
+          return Promise.reject('User name is already exist');
+        }
+      })
+     }).run(req)
+    await body('password', 'Password Cannot be Blank!').notEmpty().run(req);
+    await body('passwordConfirm', 'Confirmed Password cannot be blank!').notEmpty().run(req);
+    await body('passwordConfirm', 'Oops! Your passwords do not match').equals(req.body.password).run(req);
+  
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.errors)
+    res.send(errors.errors)
+    return; 
   }
+  
   next(); // there were no errors!
 };
 
 
-exports.register = async (req, res, next) => {
-  const user = new User({ username: req.body.username });
-  //const register = promisify(User.register, User);
-  await User.register(user, req.body.password);
-  next(); 
+exports.validateRegister2 = (req, res, next) => {
+  req.sanitizeBody('username');
+  req.checkBody('username', 'You must supply a name!').notEmpty();
+  req.checkBody('username', 'You must supply a name!').notEmpty();
+  req.checkBody('password', 'Password Cannot be Blank!').notEmpty();
+  req.checkBody('passwordConfirm', 'Confirmed Password cannot be blank!').notEmpty();
+  req.checkBody('passwordConfirm', 'Oops! Your passwords do not match').equals(req.body.password);
+  console.log("register");
+  const errors = req.validationErrors();
+  if (errors) {
+   // req.flash('error', errors.map(err => err.msg));
+   // res.render('register', { title: 'Register', body: req.body, flashes: req.flash() });
+   console.log(errors)
+    return; // stop the fn from running
+  }
+  res.send("");
+ // next(); // there were no errors!
 };
 
+
+exports.register = async (req, res) => {
+  const user = new User({ username: req.body.username });
+  await User.register(user, req.body.password);
+ res.send([]);
+};
+
+
 exports.login =  (req, res, next) => { 
-  console.log(req.user);
+  
   return passport.authenticate("local", (err, user, info) => {
   if (err) throw err;
-  if (!user) res.send("");
+  if (!user){
+    res.send(""); }
   else {
     req.logIn(user, (err) => {
       if (err) throw err;
       res.send({username : user.username , firstChar:  user.username[0]}); 
-      console.log(user.username);
     });
   }
 })(req, res, next)
@@ -64,7 +84,7 @@ exports.getUser = (req, res, next) => {
   if (req.isAuthenticated()) {
     res.send({username : req.user.username , firstChar:  req.user.username[0]}); 
   } else {
-    res.send("");
+    res.send({username : "" , firstChar:  ""});
   }
 };
 
@@ -96,9 +116,9 @@ exports.updateAccount = async (req, res) => {
 
 exports.getUsername = async (req, res , next) => {
 
-  const username = req.body.to.split(',').map( mail => mail.split('@')[0].trim());
+  const usernames = req.body.to.split(',').map( mail => mail.split('@')[0].trim());
  
-  const users = await User.find({ username: username });
+  const users = await User.find({ username: usernames });
 
   if(users.length == 0){
     res.status(400).send("nop");

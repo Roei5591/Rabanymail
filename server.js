@@ -10,6 +10,7 @@ const cookieParser = require('cookie-parser');
 const routes = require('./routes/index');
 const promisify = require('es6-promisify');
 require('./handlers/passport');
+const expressValidator = require('express-validator');
 
 
 const cors = require('cors');
@@ -21,7 +22,7 @@ const app = express();
 // import environmental variables from our variables.env file
 require('dotenv').config({ path: 'variables.env' });
 const port = process.env.PORT || 9000;
-
+//app.use(expressValidator());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());

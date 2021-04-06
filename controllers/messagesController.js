@@ -5,7 +5,6 @@ const Message = mongoose.model('Message');
 const sendgrid = require('../handlers/sendgrid');
 const parser = require('../handlers/parser');
 
-let c = 0;
 
 //to delete
 const User = mongoose.model('User');
@@ -65,7 +64,7 @@ exports.createMessage = async (req, res) => {
     req.body.isOutbound = true;
     req.body.isRead = true;
     req.body.user = req.user._id;
-    console.log(req.body);
+   
     const message = new Message(req.body);  
          
     await message.save()
@@ -88,14 +87,13 @@ exports.createMessage = async (req, res) => {
       delete mail._doc.user;
       return mail;
     });
-    console.log("inbox");
-    //console.log(inbox[0]);
+  
     res.send(inbox);   
   };
 
   exports.getAllMail = async (req, res) => {
 
-    req.isAuthenticated();
+    //req.isAuthenticated();
 
     const mailSize = req.body.mailSize;
 
@@ -103,11 +101,11 @@ exports.createMessage = async (req, res) => {
     const allMail = await Message.find({user: req.user._id});
     
     if(allMail.length !== mailSize) {
-
     allMail.forEach(mail => {
       delete mail._doc.user;
       return mail;
     });
+
     res.send({allMail , needToUpdate : true});  
   } else {
     res.send({allMail : [] , needToUpdate : false}); 
@@ -168,7 +166,7 @@ exports.createMessage = async (req, res) => {
       } 
     }); 
 
-    
+
     res.send("remove");   
   };
 
