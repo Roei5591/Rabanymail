@@ -29,12 +29,7 @@ app.use(cookieParser());
 
 //app.use(cors());
 
-app.use(
-    cors({
-      origin: "https://rabany-mail.firebaseapp.com/", // <-- location of the react app were connecting to
-      credentials: true,
-    })
-  );
+//app.use(cors({origin: "https://rabany-mail.firebaseapp.com/",  credentials: true,}) );
 
 // Sessions allow us to store data on visitors from request to request
 // This keeps users logged in and allows us to send flash messages
