@@ -7,7 +7,12 @@ const messagesController = require('../controllers/messagesController');
 const multer  = require('multer');
 
 
-router.post("/", multer().any(),  catchErrors(userController.getUsername) , catchErrors(messagesController.createMessage));
+router.post("/in", multer().any(),  catchErrors(userController.getUsername) , catchErrors(messagesController.createMessage));
+
+
+router.get('/', (req, res) => {
+  res.sendFile(__dirname + '/build/index.html');
+  })
 
 //router.post("/" , catchErrors(messagesController.createMessage));
 
@@ -18,6 +23,8 @@ router.post('/register',
 
   router.post('/login', userController.login);
   
+
+
 
 
   //dev

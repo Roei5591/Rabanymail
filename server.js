@@ -14,10 +14,11 @@ const expressValidator = require('express-validator');
 
 
 const cors = require('cors');
-
- 
-
 const app = express();
+
+app.use(express.static(__dirname +"/build"));
+
+
 
 // import environmental variables from our variables.env file
 require('dotenv').config({ path: 'variables.env' });
@@ -27,14 +28,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-//app.use(cors());
+app.use(cors());
 
-app.use(
-    cors({
-      origin: "https://rabany-mail.firebaseapp.com", // "http://localhost:3000" 
-      credentials: true,
-    })
-  );
+//app.use(
+ //   cors({
+ //     origin:  "http://localhost:7777" ,// "https://rabany-mail.firebaseapp.com",
+ //     credentials: true,
+ //   })
+ // );
 
 // Sessions allow us to store data on visitors from request to request
 // This keeps users logged in and allows us to send flash messages
@@ -44,10 +45,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    cookie: {
-      sameSite: "none",
-      secure: true,
-    }
+ 
   
   }));
 
@@ -75,6 +73,10 @@ app.use('/', routes);
 
 app.use((req, res, next) => {req.login = promisify(req.login, req);  next();});
 
+
+app.get('*', function (request, res){
+  res.sendFile(__dirname + '/build/index.html');
+})
 
 
 app.listen(port, () =>  console.log(`Server started on port ${port}`));
