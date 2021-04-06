@@ -31,7 +31,7 @@ app.use(cookieParser());
 
 app.use(
     cors({
-      origin: "http://localhost:3000", // <-- location of the react app were connecting to
+      origin: "https://rabany-mail.firebaseapp.com/", // <-- location of the react app were connecting to
       credentials: true,
     })
   );
