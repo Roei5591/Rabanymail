@@ -5,7 +5,7 @@ const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
 require('./models/User');
 require('./models/Message');
-const bodyParser = require('body-parser');
+
 const cookieParser = require('cookie-parser');
 const routes = require('./routes/index');
 const promisify = require('es6-promisify');
@@ -23,30 +23,28 @@ app.use(express.static(__dirname +"/build"));
 // import environmental variables from our variables.env file
 require('dotenv').config({ path: 'variables.env' });
 const port = process.env.PORT || 9000;
-//app.use(expressValidator());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(cors());
+//app.use(cors());
 
-//app.use(
- //   cors({
- //     origin:  "http://localhost:7777" ,// "https://rabany-mail.firebaseapp.com",
- //     credentials: true,
- //   })
- // );
+app.use(
+    cors({
+      origin:  "https://rabany-mail.herokuapp.com" ,//"http://localhost:3000" ,
+      credentials: true,
+   })
+  );
 
 // Sessions allow us to store data on visitors from request to request
-// This keeps users logged in and allows us to send flash messages
+// This keeps users logged in
 app.use(session({
     secret: process.env.SECRET,
     key: process.env.KEY,
     resave: false,
     saveUninitialized: false,
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
- 
-  
   }));
 
 
@@ -58,7 +56,7 @@ mongoose.connect(process.env.DATABASE , {
     useUnifiedTopology: true
    });
 
-   mongoose.Promise = global.Promise;
+  
 
 mongoose.connection.on('error', (err) => {
     console.error( err.message);
@@ -71,10 +69,10 @@ app.use(passport.session());
 
 app.use('/', routes);
 
-app.use((req, res, next) => {req.login = promisify(req.login, req);  next();});
+//app.use((req, res, next) => {req.login = promisify(req.login, req);  next();});
 
 
-app.get('*', function (request, res){
+app.get('*', function (req, res){
   res.sendFile(__dirname + '/build/index.html');
 })
 

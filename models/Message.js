@@ -58,7 +58,11 @@ function autopopulate(next) {
   next();
 }
 
-messageSchema.pre('find', autopopulate);
-messageSchema.pre('findOne', autopopulate);
+//messageSchema.pre('find', autopopulate);
+//messageSchema.pre('findOne', autopopulate);
+
+//messageSchema.pre('find', (doc) => {delete doc.subject});
+//messageSchema.post('find', (doc) => {delete doc.user});
 
 module.exports = mongoose.model('Message' , messageSchema );
+

@@ -3,18 +3,19 @@ const router = express.Router();
 const { catchErrors } = require('../handlers/errorHandlers');
 const userController = require('../controllers/userController');
 const messagesController = require('../controllers/messagesController');
-
 const multer  = require('multer');
 
 
-router.post("/in", multer().any(),  catchErrors(userController.getUsername) , catchErrors(messagesController.createMessage));
-
-
+//serve the front-end
 router.get('/', (req, res) => {
   res.sendFile(__dirname + '/build/index.html');
   })
 
-//router.post("/" , catchErrors(messagesController.createMessage));
+  //route for incoming messages from sendgrid
+router.post("/in", multer().any(),  catchErrors(userController.getUser) , catchErrors(messagesController.createMessage));
+
+
+
 
 router.post('/register',
   userController.validateRegister,
@@ -23,16 +24,11 @@ router.post('/register',
 
   router.post('/login', userController.login);
   
-
-
-
-
-  //dev
-  router.get("/user", userController.getUser);
-
+  router.get("/user", userController.getUsername);
   router.get('/logout', userController.logout);
 
   router.post('/messages', catchErrors(messagesController.sendMessage));
+
   router.get('/messages/inbox' , catchErrors(messagesController.getInbox));
 
 

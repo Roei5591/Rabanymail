@@ -30,26 +30,6 @@ exports.validateRegister = async (req, res, next) => {
 };
 
 
-exports.validateRegister2 = (req, res, next) => {
-  req.sanitizeBody('username');
-  req.checkBody('username', 'You must supply a name!').notEmpty();
-  req.checkBody('username', 'You must supply a name!').notEmpty();
-  req.checkBody('password', 'Password Cannot be Blank!').notEmpty();
-  req.checkBody('passwordConfirm', 'Confirmed Password cannot be blank!').notEmpty();
-  req.checkBody('passwordConfirm', 'Oops! Your passwords do not match').equals(req.body.password);
-  console.log("register");
-  const errors = req.validationErrors();
-  if (errors) {
-   // req.flash('error', errors.map(err => err.msg));
-   // res.render('register', { title: 'Register', body: req.body, flashes: req.flash() });
-   console.log(errors)
-    return; // stop the fn from running
-  }
-  res.send("");
- // next(); // there were no errors!
-};
-
-
 exports.register = async (req, res) => {
   const user = new User({ username: req.body.username });
   await User.register(user, req.body.password);
@@ -74,12 +54,12 @@ exports.login =  (req, res, next) => {
 };
 
 exports.logout = (req, res) => {
-  //const name = req.user.username
+  
   req.logout();
   res.send("logout");
 };
 
-exports.getUser = (req, res, next) => {
+exports.getUsername = (req, res, next) => {
   // first check if the user is authenticated
   if (req.isAuthenticated()) {
     res.send({username : req.user.username , firstChar:  req.user.username[0]}); 
@@ -88,16 +68,6 @@ exports.getUser = (req, res, next) => {
   }
 };
 
-exports.isLoggedIn2 = (req, res, next) => {
-  // first check if the user is authenticated
-  if (req.isAuthenticated()) {
-    next(); // carry on! They are logged in!
-    return;
-  } else console.log("NO USER A");
-
-  
-  res.redirect('/login');
-};
 
 exports.updateAccount = async (req, res) => {
   const updates = {
@@ -114,7 +84,7 @@ exports.updateAccount = async (req, res) => {
   res.redirect('back');
 };
 
-exports.getUsername = async (req, res , next) => {
+exports.getUser = async (req, res , next) => {
 
   const usernames = req.body.to.split(',').map( mail => mail.split('@')[0].trim());
  
@@ -129,16 +99,4 @@ exports.getUsername = async (req, res , next) => {
   }
 };
 
-exports.getUsername2 = async (EmailAddress) => {
 
-
-  //console.log(req.body);
-  
-  const username =  EmailAddress.split('@').trim();
- 
-  //console.log("NAME: " + username);
-  const user = await User.findOne({ username: username });
-  //console.log(user);
-
-  return user;
-};
