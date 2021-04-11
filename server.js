@@ -32,7 +32,7 @@ app.use(cookieParser());
 
 app.use(
     cors({
-      origin:  "https://rabany-mail.herokuapp.com" ,//"http://localhost:3000" ,
+      origin: "http://localhost:3000" ,  //"https://rabany-mail.herokuapp.com"
       credentials: true,
    })
   );
@@ -75,6 +75,9 @@ app.use('/', routes);
 app.get('*', function (req, res){
   res.sendFile(__dirname + '/build/index.html');
 })
+
+
+
 
 
 app.listen(port, () =>  console.log(`Server started on port ${port}`));

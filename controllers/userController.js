@@ -49,7 +49,7 @@ exports.login =  (req, res, next) => {
       res.send({username : user.username , firstChar:  user.username[0]}); 
     });
   }
-})(req, res, next)
+} )(req, res, next)
 
 };
 
