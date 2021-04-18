@@ -6,26 +6,36 @@ const { body, validationResult } = require('express-validator');
 
 
 exports.validateRegister = async (req, res, next) => {
- 
-    await body('username', 'You must supply a name!').notEmpty().run(req),
-    await body('username').custom(value => {
-      return  User.findOne({ username: req.body.username }).then(user => {
+    req.body.username += "@rabanymail.com";
+
+    const validations = [
+     body('username').custom(username => {
+      if(username.length < 18 || username.length > 35) return Promise.reject('User name should be between 3 and 20 characters');
+      username = username.split("@")[0];
+      return  User.findOne({ username }).then(user => {
         if (user) {
           return Promise.reject('User name is already exist');
         }
       })
-     }).run(req)
-    await body('password', 'Password Cannot be Blank!').notEmpty().run(req);
-    await body('passwordConfirm', 'Confirmed Password cannot be blank!').notEmpty().run(req);
-    await body('passwordConfirm', 'Oops! Your passwords do not match').equals(req.body.password).run(req);
-  
+     }) ,
+     body('username', 'invalid username').isEmail() ,
+     body('password').custom(password => {
+      if(password.length < 4 || password.length > 10) return Promise.reject('password should be between 4 and 10 characters');
+      return  Promise.resolve();
+     }),
+     body('passwordConfirm', 'Oops! Your passwords do not match').equals(req.body.password),
+    ]
+
+    //run all the validators
+    await Promise.all(validations.map(validation => validation.run(req)));
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors.errors)
     res.send(errors.errors)
     return; 
   }
-  
+  req.body.username = req.body.username.split("@")[0];
+
   next(); // there were no errors!
 };
 
@@ -33,7 +43,8 @@ exports.validateRegister = async (req, res, next) => {
 exports.register = async (req, res) => {
   const user = new User({ username: req.body.username });
   await User.register(user, req.body.password);
- res.send([]);
+  //return empty error array
+  res.send([]);
 };
 
 
@@ -68,21 +79,6 @@ exports.getUsername = (req, res, next) => {
   }
 };
 
-
-exports.updateAccount = async (req, res) => {
-  const updates = {
-    name: req.body.name,
-    email: req.body.email
-  };
-
-  const user = await User.findOneAndUpdate(
-    { _id: req.user._id },
-    { $set: updates },
-    { new: true, runValidators: true, context: 'query' }
-  );
-  req.flash('success', 'Updated the profile!');
-  res.redirect('back');
-};
 
 exports.getUser = async (req, res , next) => {
 

@@ -5,22 +5,16 @@ const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
 require('./models/User');
 require('./models/Message');
-
 const cookieParser = require('cookie-parser');
 const routes = require('./routes/index');
-const promisify = require('es6-promisify');
 require('./handlers/passport');
-const expressValidator = require('express-validator');
-
-
 const cors = require('cors');
+
 const app = express();
 
 app.use(express.static(__dirname +"/build"));
 
 
-
-// import environmental variables from our variables.env file
 require('dotenv').config({ path: 'variables.env' });
 const port = process.env.PORT || 9000;
 
@@ -28,17 +22,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-//app.use(cors());
-
 app.use(
     cors({
-      origin: "http://localhost:3000" ,  //"https://rabany-mail.herokuapp.com"
+      origin: process.env.CORS ,  
       credentials: true,
    })
   );
 
-// Sessions allow us to store data on visitors from request to request
-// This keeps users logged in
+
 app.use(session({
     secret: process.env.SECRET,
     key: process.env.KEY,
@@ -62,14 +53,12 @@ mongoose.connection.on('error', (err) => {
     console.error( err.message);
   });
 
-// Passport JS is what we use to handle our logins
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 
 app.use('/', routes);
-
-//app.use((req, res, next) => {req.login = promisify(req.login, req);  next();});
 
 
 app.get('*', function (req, res){
@@ -77,9 +66,5 @@ app.get('*', function (req, res){
 })
 
 
-
-
-
 app.listen(port, () =>  console.log(`Server started on port ${port}`));
-
 

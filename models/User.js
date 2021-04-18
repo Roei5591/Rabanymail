@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 const mongodbErrorHandler = require('mongoose-mongodb-errors');
 const passportLocalMongoose = require('passport-local-mongoose');
 
-mongoose.Promise = global.Promise;
 
 const userSchema = new Schema({
   username: {
@@ -11,12 +10,8 @@ const userSchema = new Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    //validate: [validator.isEmail, 'Invalid Email Address'],
-    //required: 'Please Supply an email address'
   },
 
-  //resetPasswordToken: String,
-  //resetPasswordExpires: Date,
 });
 
 
