@@ -10,7 +10,7 @@ password: test
 <br/>
 (or sign up to get your own mail-box)
 
-## Rabanymail (frontend repository)
+## Rabanymail (backend repository)
 
 Rabany mail is an anonymous and intuitive mail-box service.
 After an easy sign-up process, just pick a user name and a password, you get an email address (your-user-name@rabanymail.com).
