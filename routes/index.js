@@ -14,9 +14,6 @@ router.get('/', (req, res) => {
   //route for incoming messages from sendgrid
 router.post("/in", multer().any(),  catchErrors(userController.getUser) , catchErrors(messagesController.createMessage));
 
-
-
-
 router.post('/register',
   userController.validateRegister,
   catchErrors(userController.register),
@@ -31,15 +28,11 @@ router.post('/register',
 
   router.get('/messages/inbox' , catchErrors(messagesController.getInbox));
 
-
-  router.post('/messages/allmail' , catchErrors(messagesController.getAllMail));
-
+  router.post('/messages/allmail' ,userController.isLogin ,catchErrors(messagesController.getAllMail));
 
   router.get('/messages/sent' , catchErrors(messagesController.getSent));
 
-
   router.get('/messages/starred' , catchErrors(messagesController.getStarred));
-
 
   router.post('/messages/starred' , catchErrors(messagesController.toggleStarMassage));
   router.post('/messages/markasread' , catchErrors(messagesController.markAsRead));

@@ -79,7 +79,6 @@ exports.getUsername = (req, res, next) => {
   }
 };
 
-
 exports.getUser = async (req, res , next) => {
 
   const usernames = req.body.to.split(',').map( mail => mail.split('@')[0].trim());
@@ -92,6 +91,16 @@ exports.getUser = async (req, res , next) => {
   } else {
   res.locals.users = users;
   next();
+  }
+};
+
+exports.isLogin = (req, res, next) => {
+  
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.status(300).send("no login");
+
   }
 };
 

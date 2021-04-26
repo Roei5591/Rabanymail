@@ -13,7 +13,6 @@ exports.createMessage = async (req, res) => {
   const users = res.locals.users; 
   const msg = parser.parseMessage(req);
 
-
   for(const user of users) {
     try {
       msg.to = `${user.username}@rabanymail.com`;
@@ -37,11 +36,8 @@ exports.createMessage = async (req, res) => {
 
     let msg;
 
-    //const to = req.body.to;
-    console.log("send here:")
-    
       try {
-      //req.body.to = email;
+    
       req.body.from = `${req.user.username}@rabanymail.com`;
      
       msg = {...req.body};
@@ -52,17 +48,16 @@ exports.createMessage = async (req, res) => {
         console.error(error.response.body.errors)
       }
 
-     
-
    // req.body.to = to;
     req.body.isOutbound = true;
     req.body.isRead = true;
     req.body.user = req.user._id;
    
-    const message = new Message(req.body);  
-         
+    const message = new Message(req.body); 
+    
     await message.save()
-
+    
+    req.body._id = message._id;
     //await Message.deleteMany();
 
     delete req.body.user;
@@ -102,7 +97,6 @@ exports.createMessage = async (req, res) => {
 
   exports.toggleStarMassage = async (req, res) => {
 
-     
     const messageId = req.body.mailId;
     
     const toggle = !(await Message.findById( messageId)).isStarred;
@@ -120,7 +114,7 @@ exports.createMessage = async (req, res) => {
 
     const messageId = req.body.mailId;
     
-  
+
     await Message.deleteMany({_id: messageId} , function (err) {
        
       if (err){ 
